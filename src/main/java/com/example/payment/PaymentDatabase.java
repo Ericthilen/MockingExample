@@ -1,5 +1,5 @@
 package com.example.payment;
 
-public class PaymentDatabase {
+public interface PaymentDatabase {
     void savePayment(double amount, String status);
 }

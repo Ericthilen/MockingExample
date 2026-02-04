@@ -1,5 +1,5 @@
 package com.example.payment;
 
-public class PaymentApiClient {
+public interface PaymentApiClient {
     PaymentApiResponse charge(String apiKey, double amount);
 }
