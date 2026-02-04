@@ -141,4 +141,22 @@ class BookingSystemTest {
         assertThat(result).isTrue();
     }
 
+    @Test
+    void getAvailableRooms_filtersCorrectly() {
+        LocalDateTime start = NOW.plusHours(1);
+        LocalDateTime end = NOW.plusHours(2);
+
+        Room r1 = mock(Room.class);
+        Room r2 = mock(Room.class);
+
+        when(r1.isAvailable(start, end)).thenReturn(true);
+        when(r2.isAvailable(start, end)).thenReturn(false);
+
+        when(roomRepository.findAll()).thenReturn(List.of(r1, r2));
+
+        List<Room> result = bookingSystem.getAvailableRooms(start, end);
+
+        assertThat(result).containsExactly(r1);
+    }
+
 }
