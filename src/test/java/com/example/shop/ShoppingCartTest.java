@@ -11,4 +11,13 @@ class ShoppingCartTest {
         cart.addItem("Apple", 10.0, 1);
         assertThat(cart.getTotalQuantity()).isEqualTo(1);
     }
+
+    @Test
+    void getTotalPrice_shouldReturnSumOfAllItems() {
+        shop.ShoppingCart cart = new shop.ShoppingCart();
+        cart.addItem("Apple", 10.0, 2);   // 20
+        cart.addItem("Banana", 5.0, 1);   // 5
+        assertThat(cart.getTotalPrice()).isEqualTo(25.0);
+    }
+
 }
