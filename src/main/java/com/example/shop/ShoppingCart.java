@@ -34,4 +34,17 @@ public class ShoppingCart {
     public void removeItem(String name) {
         items.removeIf(i -> i.name.equals(name));
     }
+
+    public void updateQuantity(String name, int newQuantity) {
+        for (Item item : items) {
+            if (item.name.equals(name)) {
+                if (newQuantity <= 0) {
+                    items.remove(item);
+                } else {
+                    item.quantity = newQuantity;
+                }
+                return;
+            }
+        }
+    }
 }

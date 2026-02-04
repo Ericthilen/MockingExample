@@ -29,4 +29,12 @@ class ShoppingCartTest {
         assertThat(cart.getTotalPrice()).isEqualTo(0.0);
     }
 
+    @Test
+    void updateQuantity_shouldModifyExistingItemQuantity() {
+        shop.ShoppingCart cart = new shop.ShoppingCart();
+        cart.addItem("Apple", 10.0, 2);
+        cart.updateQuantity("Apple", 5);
+        assertThat(cart.getTotalQuantity()).isEqualTo(5);
+        assertThat(cart.getTotalPrice()).isEqualTo(50.0);
+    }
 }
