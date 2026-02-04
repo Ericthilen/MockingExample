@@ -159,4 +159,65 @@ class BookingSystemTest {
         assertThat(result).containsExactly(r1);
     }
 
+    @Test
+    void cancelBooking_success() throws NotificationException {
+        String id = "b1";
+        Room room = mock(Room.class);
+        Booking booking = mock(Booking.class);
+
+        when(roomRepository.findAll()).thenReturn(List.of(room));
+        when(room.hasBooking(id)).thenReturn(true);
+        when(room.getBooking(id)).thenReturn(booking);
+        when(booking.getStartTime()).thenReturn(NOW.plusHours(1));
+
+        boolean result = bookingSystem.cancelBooking(id);
+
+        assertThat(result).isTrue();
+        verify(room).removeBooking(id);
+        verify(roomRepository).save(room);
+        verify(notificationService).sendCancellationConfirmation(any(Booking.class));
+    }
+
+    @Test
+    void cancelBooking_notFound() {
+        when(roomRepository.findAll()).thenReturn(List.of());
+
+        boolean result = bookingSystem.cancelBooking("x");
+
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    void cancelBooking_started() {
+        String id = "b1";
+        Room room = mock(Room.class);
+        Booking booking = mock(Booking.class);
+
+        when(roomRepository.findAll()).thenReturn(List.of(room));
+        when(room.hasBooking(id)).thenReturn(true);
+        when(room.getBooking(id)).thenReturn(booking);
+        when(booking.getStartTime()).thenReturn(NOW.minusMinutes(1));
+
+        assertThatThrownBy(() -> bookingSystem.cancelBooking(id))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void cancelBooking_notificationFails() throws NotificationException {
+        String id = "b1";
+        Room room = mock(Room.class);
+        Booking booking = mock(Booking.class);
+
+        when(roomRepository.findAll()).thenReturn(List.of(room));
+        when(room.hasBooking(id)).thenReturn(true);
+        when(room.getBooking(id)).thenReturn(booking);
+        when(booking.getStartTime()).thenReturn(NOW.plusHours(1));
+
+        doThrow(new NotificationException("fail"))
+                .when(notificationService).sendCancellationConfirmation(any(Booking.class));
+
+        boolean result = bookingSystem.cancelBooking(id);
+
+        assertThat(result).isTrue();
+    }
 }
