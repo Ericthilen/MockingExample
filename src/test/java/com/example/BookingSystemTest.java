@@ -80,4 +80,47 @@ class BookingSystemTest {
         assertThatThrownBy(() -> bookingSystem.bookRoom(roomId, start, end))
                 .isInstanceOf(IllegalArgumentException.class);
     }
+
+    @Test
+    void bookRoom_startInPast() {
+        LocalDateTime start = NOW.minusHours(1);
+        LocalDateTime end = NOW.plusHours(1);
+
+        assertThatThrownBy(() -> bookingSystem.bookRoom("room1", start, end))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void bookRoom_endBeforeStart() {
+        LocalDateTime start = NOW.plusHours(2);
+        LocalDateTime end = NOW.plusHours(1);
+
+        assertThatThrownBy(() -> bookingSystem.bookRoom("room1", start, end))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void bookRoom_roomNotFound() {
+        LocalDateTime start = NOW.plusHours(1);
+        LocalDateTime end = NOW.plusHours(2);
+
+        when(roomRepository.findById("room1")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> bookingSystem.bookRoom("room1", start, end))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void bookRoom_roomNotAvailable() {
+        LocalDateTime start = NOW.plusHours(1);
+        LocalDateTime end = NOW.plusHours(2);
+
+        Room room = mock(Room.class);
+        when(roomRepository.findById("room1")).thenReturn(Optional.of(room));
+        when(room.isAvailable(start, end)).thenReturn(false);
+
+        boolean result = bookingSystem.bookRoom("room1", start, end);
+
+        assertThat(result).isFalse();
+    }
 }
