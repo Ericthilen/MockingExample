@@ -18,6 +18,7 @@ public class ShoppingCart {
     }
 
     private final List<Item> items = new ArrayList<>();
+    private double discount = 0.0;
 
     public void addItem(String name, double price, int quantity) {
         items.add(new Item(name, price, quantity));
@@ -28,7 +29,8 @@ public class ShoppingCart {
     }
 
     public double getTotalPrice() {
-        return items.stream().mapToDouble(i -> i.price * i.quantity).sum();
+        double total = items.stream().mapToDouble(i -> i.price * i.quantity).sum();
+        return total - (total * discount);
     }
 
     public void removeItem(String name) {
@@ -46,5 +48,12 @@ public class ShoppingCart {
                 return;
             }
         }
+    }
+
+    public void applyDiscount(double percent) {
+        if (percent < 0 || percent > 1) {
+            throw new IllegalArgumentException("Discount must be between 0 and 1");
+        }
+        this.discount = percent;
     }
 }
