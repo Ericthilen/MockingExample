@@ -35,4 +35,21 @@ class BookingSystemTest {
 
         bookingSystem = new BookingSystem(timeProvider, roomRepository, notificationService);
     }
+
+    @Test
+    @DisplayName("bookRoom ska skapa bokning och returnera true när rummet är ledigt")
+    void bookRoom_success() throws NotificationException {
+        LocalDateTime start = NOW.plusHours(1);
+        LocalDateTime end = NOW.plusHours(2);
+
+        Room room = spy(new Room("room1", "Conference Room"));
+        when(roomRepository.findById("room1")).thenReturn(Optional.of(room));
+        doReturn(true).when(room).isAvailable(start, end);
+
+        boolean result = bookingSystem.bookRoom("room1", start, end);
+
+        assertThat(result).isTrue();
+        verify(roomRepository).save(room);
+        verify(notificationService).sendBookingConfirmation(any(Booking.class));
+    }
 }
