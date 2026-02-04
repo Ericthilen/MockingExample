@@ -52,4 +52,32 @@ class BookingSystemTest {
         verify(roomRepository).save(room);
         verify(notificationService).sendBookingConfirmation(any(Booking.class));
     }
+
+    static Stream<org.junit.jupiter.params.provider.Arguments> invalidTimes() {
+        LocalDateTime now = LocalDateTime.of(2025, 1, 1, 12, 0);
+        return Stream.of(
+                org.junit.jupiter.params.provider.Arguments.of(null, now.plusHours(1)),
+                org.junit.jupiter.params.provider.Arguments.of(now.plusHours(1), null),
+                org.junit.jupiter.params.provider.Arguments.of(null, null)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidTimes")
+    @DisplayName("bookRoom ska kasta exception vid null start/sluttid")
+    void bookRoom_nullTimes(LocalDateTime start, LocalDateTime end) {
+        assertThatThrownBy(() -> bookingSystem.bookRoom("room1", start, end))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @DisplayName("bookRoom ska kasta exception när roomId är null")
+    void bookRoom_nullRoomId(String roomId) {
+        LocalDateTime start = NOW.plusHours(1);
+        LocalDateTime end = NOW.plusHours(2);
+
+        assertThatThrownBy(() -> bookingSystem.bookRoom(roomId, start, end))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
 }
