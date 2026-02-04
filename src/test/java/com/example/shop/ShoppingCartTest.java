@@ -20,4 +20,13 @@ class ShoppingCartTest {
         assertThat(cart.getTotalPrice()).isEqualTo(25.0);
     }
 
+    @Test
+    void removeItem_shouldRemoveItemCompletely() {
+        shop.ShoppingCart cart = new shop.ShoppingCart();
+        cart.addItem("Apple", 10.0, 2);
+        cart.removeItem("Apple");
+        assertThat(cart.getTotalQuantity()).isEqualTo(0);
+        assertThat(cart.getTotalPrice()).isEqualTo(0.0);
+    }
+
 }

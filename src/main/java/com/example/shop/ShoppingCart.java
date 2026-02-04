@@ -30,4 +30,8 @@ public class ShoppingCart {
     public double getTotalPrice() {
         return items.stream().mapToDouble(i -> i.price * i.quantity).sum();
     }
+
+    public void removeItem(String name) {
+        items.removeIf(i -> i.name.equals(name));
+    }
 }
