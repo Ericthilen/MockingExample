@@ -45,4 +45,25 @@ class ShoppingCartTest {
         cart.applyDiscount(0.10);
         assertThat(cart.getTotalPrice()).isEqualTo(18.0);
     }
+
+    @Test
+    void applyDiscount_invalidPercent_shouldThrowException() {
+        shop.ShoppingCart cart = new shop.ShoppingCart();
+        assertThatThrownBy(() -> cart.applyDiscount(1.1))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> cart.applyDiscount(-0.1))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void updateQuantity_toZeroOrLess_shouldRemoveItem() {
+        shop.ShoppingCart cart = new shop.ShoppingCart();
+        cart.addItem("Apple", 10.0, 2);
+        cart.updateQuantity("Apple", 0);
+        assertThat(cart.getTotalQuantity()).isEqualTo(0);
+
+        cart.addItem("Banana", 5.0, 1);
+        cart.updateQuantity("Banana", -1);
+        assertThat(cart.getTotalQuantity()).isEqualTo(0);
+    }
 }
