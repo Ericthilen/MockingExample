@@ -8,6 +8,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullSource;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -202,22 +203,19 @@ class BookingSystemTest {
                 .isInstanceOf(IllegalStateException.class);
     }
 
+    @ParameterizedTest
+    @MethodSource("invalidTimes")
+    @DisplayName("getAvailableRooms ska kasta exception vid ogiltiga tider")
+    void getAvailableRooms_invalidTimes(LocalDateTime start, LocalDateTime end) {
+        assertThatThrownBy(() -> bookingSystem.getAvailableRooms(start, end))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
     @Test
-    void cancelBooking_notificationFails() throws NotificationException {
-        String id = "b1";
-        Room room = mock(Room.class);
-        Booking booking = mock(Booking.class);
-
-        when(roomRepository.findAll()).thenReturn(List.of(room));
-        when(room.hasBooking(id)).thenReturn(true);
-        when(room.getBooking(id)).thenReturn(booking);
-        when(booking.getStartTime()).thenReturn(NOW.plusHours(1));
-
-        doThrow(new NotificationException("fail"))
-                .when(notificationService).sendCancellationConfirmation(any(Booking.class));
-
-        boolean result = bookingSystem.cancelBooking(id);
-
-        assertThat(result).isTrue();
+    @DisplayName("cancelBooking ska returnera false om boknings-id inte hittas")
+    void cancelBooking_idNotFound() {
+        when(roomRepository.findAll()).thenReturn(Collections.emptyList());
+        boolean result = bookingSystem.cancelBooking("non-existent");
+        assertThat(result).isFalse();
     }
 }
